@@ -1,0 +1,9 @@
+You can run the script on CentO/Ubuntu by passing the domain name as an argument like this:
+
+sh wp_install.sh example.com
+
+
+Always make the scripts executable
+
+chmod +x script.shs
+
