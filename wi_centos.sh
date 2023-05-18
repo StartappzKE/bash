@@ -1,28 +1,43 @@
 #!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Please provide the domain name as an argument."
+    exit 1
+fi
+
+domain=$1
+
 echo "============================================"
 echo "Install LEMP stack with bash"
 echo "============================================"
 
-echo "Install EPEL repository"
-yum install epel-release -y
+echo "Add repository for PHP 7.4"
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:ondrej/php -y
 
-echo "Install Remi repository"
-yum install http://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
+echo "Update packages"
+sudo apt-get update -y
 
-echo "Install required packages"
-yum install httpd mariadb-server php php-cli php-fpm php-common php-mysqlnd php-xml php-zip php-mbstring php-json php-curl php-gd php-pgsql -y
+echo "Install Apache web server"
+sudo apt install apache2 -y
+
+echo "Install database"
+sudo apt install mysql-server -y
+
+echo "Install PHP and required modules"
+sudo apt install php7.4-fpm php7.4-common php7.4-xml php7.4-zip php7.4-mysql php7.4-mbstring php7.4-json php7.4-curl php7.4-gd php7.4-pgsql -y
 
 echo "Start services"
-systemctl start httpd
-systemctl start mariadb
+sudo systemctl restart apache2
+sudo systemctl restart mysql
 
 echo "Enable services"
-systemctl enable httpd
-systemctl enable mariadb
+sudo systemctl enable apache2
+sudo systemctl enable mysql
 
 echo "Check service status"
-echo "Apache service status: $(systemctl is-active httpd)"
-echo "Database service status: $(systemctl is-active mariadb)"
+echo "Apache service status: $(systemctl show -p ActiveState --value apache2)"
+echo "Database service status: $(systemctl show -p ActiveState --value mysql)"
 
 echo "============================================"
 echo "Create database & user for WordPress"
@@ -56,41 +71,68 @@ curl -O https://wordpress.org/latest.tar.gz
 tar -zxvf latest.tar.gz
 
 # Move WordPress files to web server root
-mv wordpress/* /var/www/html/
+sudo mv wordpress/* /var/www/html/
 
 # Change ownership and permissions
-chown -R apache:apache /var/www/html/
-chmod -R 755 /var/www/html/
+sudo chown -R www-data:www-data /var/www/html/
+sudo chmod -R 755 /var/www/html/
 
 # Create wp-config.php
 cd /var/www/html/
-cp wp-config-sample.php wp-config.php
-chown apache:apache wp-config.php
+sudo cp wp-config-sample.php wp-config.php
+sudo chown www-data:www-data wp-config.php
 
 # Set database details with sed find and replace
-sed -i "s/database_name_here/$dbname/g" wp-config.php
-sed -i "s/username_here/$user/g" wp-config.php
-sed -i "s/password_here/$pass/g" wp-config.php
+sudo sed -i "s/database_name_here/$dbname/g" wp-config.php
+sudo sed -i "s/username_here/$user/g" wp-config.php
+sudo sed -i "s/password_here/$pass/g" wp-config.php
 
 # Set WP salts
 curl -s https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
 
 # Create uploads folder and set permissions
-mkdir wp-content/uploads
-chmod 775 wp-content/uploads
+sudo mkdir wp-content/uploads
+sudo chmod 775 wp-content/uploads
+
+echo "============================================"
+echo "Create VirtualHost for WordPress"
+echo "============================================"
+
+# Create VirtualHost configuration file
+sudo tee /etc/apache2/sites-available/wordpress.conf > /dev/null <<EOF
+<VirtualHost *:80>
+    ServerAdmin admin@$domain
+    ServerName $domain
+    DocumentRoot /var/www/html
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    <Directory /var/www/html/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+EOF
+
+# Enable the VirtualHost
+sudo a2ensite wordpress.conf
+
+# Disable the default VirtualHost
+sudo a2dissite 000-default.conf
+
+# Reload Apache configuration
+sudo systemctl reload apache2
 
 echo "============================================"
 echo "Install Certbot and configure SSL"
 echo "============================================"
 
 # Install Certbot and Apache plugin
-yum install certbot python3-certbot-apache -y
-
-# Set your domain name
-domain="example.com"
+sudo apt install certbot python3-certbot-apache -y
 
 # Obtain and install SSL certificate
-certbot run -n --apache --agree-tos -d $domain -m admin@$domain --redirect
+sudo certbot run -n --apache --agree-tos -d $domain -m admin@$domain --redirect
 
 echo "========================="
 echo "Installation is complete."

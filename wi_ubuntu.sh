@@ -1,4 +1,12 @@
 #!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Please provide the domain name as an argument."
+    exit 1
+fi
+
+domain=$1
+
 echo "============================================"
 echo "Install LEMP stack with bash"
 echo "============================================"
@@ -87,14 +95,41 @@ sudo mkdir wp-content/uploads
 sudo chmod 775 wp-content/uploads
 
 echo "============================================"
+echo "Create VirtualHost for WordPress"
+echo "============================================"
+
+# Create VirtualHost configuration file
+sudo tee /etc/apache2/sites-available/wordpress.conf > /dev/null <<EOF
+<VirtualHost *:80>
+    ServerAdmin admin@$domain
+    ServerName $domain
+    DocumentRoot /var/www/html
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    <Directory /var/www/html/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+EOF
+
+# Enable the VirtualHost
+sudo a2ensite wordpress.conf
+
+# Disable the default VirtualHost
+sudo a2dissite 000-default.conf
+
+# Reload Apache configuration
+sudo systemctl reload apache2
+
+echo "============================================"
 echo "Install Certbot and configure SSL"
 echo "============================================"
 
 # Install Certbot and Apache plugin
 sudo apt install certbot python3-certbot-apache -y
-
-# Set your domain name
-domain="example.com"
 
 # Obtain and install SSL certificate
 sudo certbot run -n --apache --agree-tos -d $domain -m admin@$domain --redirect
