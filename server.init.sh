@@ -27,7 +27,7 @@ fi
 
 # Install necessary packages
 dnf install -y epel-release
-dnf install -y mariadb-server php php-fpm php-mysqlnd certbot $certbot_package
+dnf install -y mariadb-server php php-fpm php-mysqlnd git certbot $certbot_package
 
 # Enable and start MariaDB
 systemctl enable --now mariadb
@@ -140,6 +140,8 @@ php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 php -r "unlink('composer-setup.php');"
 
 mv composer.phar /usr/local/bin/composer
+
+git config credential.helper store
 
 # Apply production-level security configurations
 # Add your production security configurations here
