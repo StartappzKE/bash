@@ -69,6 +69,7 @@ mv wordpress/* /var/www/html/
 # Change ownership and permissions
 chown -R apache:apache /var/www/html/
 chmod -R 755 /var/www/html/
+chcon -R -t httpd_sys_rw_content_t /var/www/html/
 
 # Create wp-config.php
 cd /var/www/html/
