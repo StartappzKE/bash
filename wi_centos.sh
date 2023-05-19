@@ -119,6 +119,18 @@ yum install certbot python3-certbot-apache -y
 # Obtain and install SSL certificate
 certbot run -n --apache --agree-tos -d $domain -m admin@$domain --redirect
 
+
+echo "============================================"
+echo "Adding Autorenew of SSL"
+echo "============================================"
+
+# Define the cron schedule
+cron_schedule="0 12 * * *"
+
+# Add the autorenew script to the crontab
+(crontab -l 2>/dev/null; echo "$cron_schedule python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew") | crontab -
+
+
 echo "========================="
 echo "Installation is complete."
 echo "========================="
