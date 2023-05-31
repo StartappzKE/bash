@@ -5,5 +5,8 @@ sh wp_install.sh example.com
 
 Always make the scripts executable
 
-chmod +x script.shs
+chmod +x script.sh
+
+
+sh create_swap.sh 8192
 

@@ -7,6 +7,9 @@ fi
 
 domain=$1
 
+echo "updating os this may take a couple of minutes"
+sudo dnf upgrade --refresh
+
 echo "============================================"
 echo "Install LEMP stack with bash"
 echo "============================================"
@@ -16,6 +19,8 @@ yum install epel-release -y
 
 echo "Install Remi repository"
 yum install http://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
+
+# https://www.linuxcapable.com/how-to-install-php-on-centos-stream/
 
 echo "Install required packages"
 yum install httpd mariadb-server php php-cli php-fpm php-common php-mysqlnd php-xml php-zip php-mbstring php-json php-curl php-gd php-pgsql -y
@@ -87,6 +92,7 @@ curl -s https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
 # Create uploads folder and set permissions
 mkdir wp-content/uploads
 chmod 775 wp-content/uploads
+chown -R wp-content/uploads
 
 echo "============================================"
 echo "Create VirtualHost for WordPress"
@@ -117,8 +123,9 @@ echo "============================================"
 yum install certbot python3-certbot-apache -y
 
 # Obtain and install SSL certificate
-certbot run -n --apache --agree-tos -d $domain -m admin@$domain --redirect
+#certbot run -n --apache --agree-tos -d $domain -m admin@$domain --redirect
 
+certbot --apache -d  $domain  --redirect
 
 echo "============================================"
 echo "Adding Autorenew of SSL"
