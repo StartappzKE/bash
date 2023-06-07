@@ -94,5 +94,5 @@ curl -s https://api.wordpress.org/secret-key/1.1/salt/ >> wp-config.php
 
 # Create uploads folder and set permissions
 mkdir wp-content/uploads
-chmod 775 wp-content/uploads
-chown -R wp-content/uploads
+chmod 664 wp-content/uploads
+chown apache:apache -R wp-content/uploads

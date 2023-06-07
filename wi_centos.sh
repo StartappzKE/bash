@@ -137,6 +137,12 @@ cron_schedule="0 12 * * *"
 # Add the autorenew script to the crontab
 (crontab -l 2>/dev/null; echo "$cron_schedule python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew") | crontab -
 
+echo "Add send mail configurations"
+sudo yum install policycoreutils-python-utils
+sudo semanage permissive -a httpd_t
+sudo audit2allow -a -M httpd_sendmail
+sudo semodule -i httpd_sendmail.pp
+
 
 echo "========================="
 echo "Installation is complete."
