@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
 fi
 
 domain=$1
-
+sudo yum install dnf -y
 echo "Updating the OS. This may take a couple of minutes..."
 sudo dnf upgrade --refresh
 
@@ -140,6 +140,7 @@ echo "============================================"
 echo "Install Certbot and configure SSL"
 echo "============================================"
 
+sudo dnf install epel-release
 # Install Certbot and Apache plugin
 sudo yum install certbot python3-certbot-apache -y
 
