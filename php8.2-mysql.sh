@@ -155,3 +155,8 @@ read -p "Enter your Git email address: " git_email
 # Set Git global configuration
 git config --global user.name "$git_username"
 git config --global user.email "$git_email"
+
+setsebool -P httpd_can_network_connect_db 1
+
+sudo setsebool -P httpd_can_sendmail 1
+sudo setsebool -P httpd_can_network_connect 1

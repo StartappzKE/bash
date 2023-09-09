@@ -75,7 +75,7 @@ cat > /etc/httpd/conf.d/$conf_name.conf << EOF
 # Apache configuration directives go here
 # Replace this with your desired configuration
 <VirtualHost *:80>
-    ServerName example.com
+    ServerName $domain
     DocumentRoot /var/www/html
 
     <Directory /var/www/html>
@@ -115,7 +115,6 @@ EOF
 cat > /etc/httpd/conf.d/server_security.conf << EOF
 # Custom Server Security Measures
 <IfModule mod_headers.c>
-    <Location />
         # Add the following directives inside your Location block
         TraceEnable off
         ServerTokens Prod
@@ -127,7 +126,6 @@ cat > /etc/httpd/conf.d/server_security.conf << EOF
         Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
         Header always set Content-Security-Policy "default-src https: data: 'unsafe-inline' 'unsafe-eval'"
         Header always set X-Content-Type-Options "nosniff"
-    </Location>
 </IfModule>
 EOF
   fi
@@ -141,7 +139,7 @@ php -r "unlink('composer-setup.php');"
 
 mv composer.phar /usr/local/bin/composer
 
-git config credential.helper store
+#git config credential.helper store
 
 # Apply production-level security configurations
 # Add your production security configurations here
