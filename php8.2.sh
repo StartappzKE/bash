@@ -103,6 +103,8 @@ php -r "unlink('composer-setup.php');"
 
 mv composer.phar /usr/local/bin/composer
 
+ln -s /usr/local/bin/composer /usr/bin/composer
+
 git config credential.helper store
 
 # Apply production-level security configurations
@@ -205,6 +207,23 @@ cron_schedule="0 12 * * *"
 
 # Add the autorenew script to the crontab
 (crontab -l 2>/dev/null; echo "$cron_schedule python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew") | sudo crontab -
+
+#would you like to install nodejs
+read -p "Would you like to install nodejs? (y/n) " nodejs
+if [ "$nodejs" == "y" ]; then
+   
+   # Install Node.js and npm
+   #list available nodejs streams
+    sudo dnf module list nodejs
+
+    # Enable the desired Node.js stream ask for the version 
+    read -p "Enter the Node.js version you want to install: " node_version
+    
+    sudo dnf module install nodejs:$node_version -y
+    #sudo dnf module enable nodejs:$node_version -y
+
+    echo "Node.js and npm installation completed."
+fi
 
 
 
