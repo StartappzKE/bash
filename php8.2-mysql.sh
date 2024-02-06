@@ -118,7 +118,7 @@ EOF
 
 echo  "clone from git"
 
-git clone 'https://github.com/StartappzKE/microsite.git' /var/www/html/.
+git clone 'https://github.com/xxxxxxx/xxxxxxxx.git' /var/www/html/.
 
 chown -R apache:apache /var/www/html/
 chmod -R 755 /var/www/html/
