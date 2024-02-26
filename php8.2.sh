@@ -188,6 +188,9 @@ sudo setsebool -P httpd_can_network_connect_db 1
 sudo setsebool -P httpd_can_sendmail 1
 sudo setsebool -P httpd_can_network_connect 1
 
+#restart apache
+sudo systemctl restart httpd
+
 #install certbot
 sudo dnf install certbot python3-certbot-apache -y
 
@@ -218,7 +221,7 @@ if [ "$nodejs" == "y" ]; then
 
     # Enable the desired Node.js stream ask for the version 
     read -p "Enter the Node.js version you want to install: " node_version
-    
+
     sudo dnf module install nodejs:$node_version -y
     #sudo dnf module enable nodejs:$node_version -y
 
