@@ -44,7 +44,7 @@ echo "PHP installation completed."
 
 # LEMP stack installation continues...
 echo "Install required packages"
-sudo yum install httpd mariadb-server php-fpm php-mysqlnd php-xml php-zip php-mbstring php-json php-curl php-gd php-pgsql -y
+sudo yum install httpd mariadb-server php-fpm php-mysqlnd php-xml php-zip php-mbstring php-json php-curl php-gd php-pgsql tar -y
 
 echo "Start services"
 sudo systemctl start httpd

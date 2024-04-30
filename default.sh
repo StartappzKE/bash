@@ -58,6 +58,23 @@ echo "Check service status"
 echo "Apache service status: $(sudo systemctl is-active httpd)"
 echo "Database service status: $(sudo systemctl is-active mariadb)"
 
+
+
+echo "============================================"
+echo "Installing Firewalld and configuring"
+echo "============================================"
+
+# install firewalld
+sudo yum install firewalld -y
+#start firewalld
+sudo systemctl start firewalld
+#enable firewalld
+sudo systemctl enable firewalld
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --reload
+
+
 echo "============================================"
 echo "Create database & user for WordPress"
 echo "============================================"
