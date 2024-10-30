@@ -54,6 +54,11 @@ echo "Enable services"
 sudo systemctl enable httpd
 sudo systemctl enable mariadb
 
+echo "Restart Apache"
+sudo systemctl restart httpd
+
+
+
 echo "Check service status"
 echo "Apache service status: $(sudo systemctl is-active httpd)"
 echo "Database service status: $(sudo systemctl is-active mariadb)"
