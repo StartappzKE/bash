@@ -11,7 +11,6 @@ TOTAL_MEM=$(free -m | awk '/Mem:/ {print $2}')
 CPU_CORES=$(nproc)
 
 # Set pm.max_children based on the total memory
-# Formula: Total Memory / 25MB per child (avg PHP-FPM process size)
 if [ $TOTAL_MEM -le 1024 ]; then
     MAX_CHILDREN=40  # For 1GB RAM
 elif [ $TOTAL_MEM -le 2048 ]; then
@@ -41,6 +40,18 @@ sed -i "s/^request_terminate_timeout = .*/request_terminate_timeout = 300/" "$FP
 
 echo "PHP-FPM configuration updated: pm.max_children = $MAX_CHILDREN"
 echo "pm.start_servers = $(($MAX_CHILDREN / 4)), pm.min_spare_servers = $(($MAX_CHILDREN / 4)), pm.max_spare_servers = $(($MAX_CHILDREN / 2))"
+
+# Update Apache configuration to prevent connection pooling
+# Define the new configuration file in conf.d directory
+APACHE_CUSTOM_CONF="/etc/httpd/conf.d/php_fpm_proxy.conf"
+
+# Create a new file with SetEnv directives if it doesn't already exist
+if [ ! -f "$APACHE_CUSTOM_CONF" ]; then
+    echo -e "# Prevent connection pooling for PHP-FPM\nSetEnv proxy-nokeepalive 1\nSetEnv proxy-initial-not-pooled 1" > "$APACHE_CUSTOM_CONF"
+    echo "New Apache configuration file created at $APACHE_CUSTOM_CONF with SetEnv directives."
+else
+    echo "Apache configuration file $APACHE_CUSTOM_CONF already exists with SetEnv directives."
+fi
 
 # Restart PHP-FPM and Apache
 echo "Restarting PHP-FPM and Apache services..."
